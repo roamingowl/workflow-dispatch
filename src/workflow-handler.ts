@@ -43,7 +43,7 @@ export interface WorkflowRunResult {
   conclusion: WorkflowRunConclusion;
 }
 
-type TInputs = Record<string,  string>;
+type TInputs = Record<string, string>;
 
 export class WorkflowHandler {
   private octokit: ReturnType<typeof github.getOctokit>;
@@ -152,7 +152,7 @@ export class WorkflowHandler {
     try {
       let runs = await this.findAllWorkflowRuns();
       if (this.runName) {
-        runs = runs.filter((r) => r.name == this.runName);
+        runs = runs.filter(r => r.name == this.runName);
       }
 
       if (runs.length == 0) {
@@ -192,7 +192,7 @@ export class WorkflowHandler {
 
       // Locate workflow either by name or id
       const workflowFind = workflows.find(
-        (workflow) => workflow.name === this.workflowRef || workflow.id.toString() === this.workflowRef
+        workflow => workflow.name === this.workflowRef || workflow.id.toString() === this.workflowRef
       );
       if (!workflowFind)
         throw new Error(`Unable to find workflow '${this.workflowRef}' in ${this.owner}/${this.repo} 😥`);
@@ -209,12 +209,10 @@ export class WorkflowHandler {
     return /.+\.ya?ml$/.test(workflowRef);
   }
 
-
-
   private debugFoundWorkflowRuns(runs: TRun[]) {
     debug(
       `Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`,
-      runs.map((r) => ({
+      runs.map(r => ({
         id: r.id,
         name: r.name,
         created_at: r.created_at,

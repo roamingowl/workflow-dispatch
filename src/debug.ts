@@ -7,7 +7,7 @@ export function debug(title: string, content: unknown) {
       core.debug(JSON.stringify(content, null, 3));
     } catch (e) {
       core.debug(`Failed to serialize object, trying toString. Cause: ${(e as Error).message}`);
-      if (typeof content === 'object' && content?.toString ) {
+      if (typeof content === 'object' && content?.toString) {
         core.debug(content?.toString());
       }
     }

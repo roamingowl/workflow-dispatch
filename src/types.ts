@@ -3,4 +3,4 @@ export type TArgs = {
   owner: string;
   repo: string;
   workflowLogMode: string;
-}
+};

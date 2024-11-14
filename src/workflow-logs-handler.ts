@@ -8,8 +8,6 @@ interface JobInfo {
   id: number;
 }
 
-
-
 export async function handleWorkflowLogsPerJob(args: TArgs, workflowRunId: number): Promise<void> {
   const mode = args.workflowLogMode;
   const token = args.token;
@@ -94,7 +92,7 @@ class OutputLogsHandler implements WorkflowLogHandler {
   }
 
   getJsonLogs(): string {
-    const result: {[key: string]: {datetime: string, message: string }[]} = {};
+    const result: { [key: string]: { datetime: string; message: string }[] } = {};
     const logPattern = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{7}Z)\s+(.*)/;
 
     this.logs.forEach((logs: string, jobName: string) => {
