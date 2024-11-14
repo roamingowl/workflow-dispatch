@@ -41,7 +41,7 @@ jobs:
         run: npm run lint
 
   sonarcloud:
-    name: TypeScript Tests and SonarCloud Scan
+    name: TS Tests and SonarCloud Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
