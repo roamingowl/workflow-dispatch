@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import { formatDuration, getArgs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
+import { TArgs } from './types';
 
 async function getFollowUrl(workflowHandler: WorkflowHandler, interval: number, timeout: number) {
   const start = Date.now();
@@ -11,8 +12,8 @@ async function getFollowUrl(workflowHandler: WorkflowHandler, interval: number, 
     try {
       const result = await workflowHandler.getWorkflowRunStatus();
       url = result.url;
-    } catch (e: any) {
-      core.debug(`Failed to get workflow url: ${e.message}`);
+    } catch (e) {
+      core.debug(`Failed to get workflow url: ${(e as Error).message}`);
     }
   } while (!url && !isTimedOut(start, timeout));
   return url;
@@ -32,8 +33,8 @@ async function waitForCompletionOrTimeout(
       result = await workflowHandler.getWorkflowRunStatus();
       status = result.status;
       core.debug(`Worflow is running for ${formatDuration(Date.now() - start)}. Current status=${status}`);
-    } catch (e: any) {
-      core.warning(`Failed to get workflow status: ${e.message}`);
+    } catch (e) {
+      core.warning(`Failed to get workflow status: ${(e as Error).message}`);
     }
   } while (status !== WorkflowRunStatus.COMPLETED && !isTimedOut(start, waitForCompletionTimeout));
   return { result, start };
@@ -55,12 +56,12 @@ function computeConclusion(start: number, waitForCompletionTimeout: number, resu
   if (conclusion === WorkflowRunConclusion.TIMED_OUT) throw new Error('Workflow run has failed due to timeout');
 }
 
-async function handleLogs(args: any, workflowHandler: WorkflowHandler) {
+async function handleLogs(args: TArgs, workflowHandler: WorkflowHandler) {
   try {
     const workflowRunId = await workflowHandler.getWorkflowRunId();
     await handleWorkflowLogsPerJob(args, workflowRunId);
-  } catch (e: any) {
-    core.error(`Failed to handle logs of triggered workflow. Cause: ${e}`);
+  } catch (error) {
+    core.error(`Failed to handle logs of triggered workflow. Cause: ${(error as Error).message}`);
   }
 }
 
@@ -105,8 +106,8 @@ export async function run(): Promise<void> {
     core.setOutput('workflow-id', result?.id);
     core.setOutput('workflow-url', result?.url);
     computeConclusion(start, args.waitForCompletionTimeout, result);
-  } catch (error: any) {
-    core.setFailed(error.message);
+  } catch (error) {
+    core.setFailed((error as Error).message);
   }
 }
 

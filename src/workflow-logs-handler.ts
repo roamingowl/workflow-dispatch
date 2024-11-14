@@ -1,13 +1,16 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { debug } from './debug';
+import { TArgs } from './types';
 
 interface JobInfo {
   name: string;
   id: number;
 }
 
-export async function handleWorkflowLogsPerJob(args: any, workflowRunId: number): Promise<void> {
+
+
+export async function handleWorkflowLogsPerJob(args: TArgs, workflowRunId: number): Promise<void> {
   const mode = args.workflowLogMode;
   const token = args.token;
   const owner = args.owner;
@@ -36,8 +39,8 @@ export async function handleWorkflowLogsPerJob(args: any, workflowRunId: number)
         job_id: job.id
       });
       await handler.handleJobLogs(job, jobLog.data as string);
-    } catch (error: any) {
-      await handler.handleError(job, error);
+    } catch (error: unknown) {
+      await handler.handleError(job, error as Error);
     }
   }
 
@@ -91,7 +94,7 @@ class OutputLogsHandler implements WorkflowLogHandler {
   }
 
   getJsonLogs(): string {
-    const result: any = {};
+    const result: {[key: string]: {datetime: string, message: string }[]} = {};
     const logPattern = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{7}Z)\s+(.*)/;
 
     this.logs.forEach((logs: string, jobName: string) => {

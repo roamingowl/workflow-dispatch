@@ -8,6 +8,8 @@ export enum WorkflowRunStatus {
   COMPLETED = 'completed'
 }
 
+type TRun = { id: number; name: string; created_at: string };
+
 const ofStatus = (status: string | null): WorkflowRunStatus => {
   if (!status) {
     return WorkflowRunStatus.QUEUED;
@@ -41,8 +43,10 @@ export interface WorkflowRunResult {
   conclusion: WorkflowRunConclusion;
 }
 
+type TInputs = Record<string,  string>;
+
 export class WorkflowHandler {
-  private octokit: any;
+  private octokit: ReturnType<typeof github.getOctokit>;
   private workflowId?: number | string;
   private workflowRunId?: number;
   private triggerDate = 0;
@@ -59,7 +63,7 @@ export class WorkflowHandler {
     this.octokit = github.getOctokit(token);
   }
 
-  async triggerWorkflow(inputs: any) {
+  async triggerWorkflow(inputs: TInputs) {
     try {
       const workflowId = await this.getWorkflowId();
       this.triggerDate = new Date().setMilliseconds(0);
@@ -71,8 +75,8 @@ export class WorkflowHandler {
         inputs
       });
       debug('Workflow Dispatch', dispatchResp);
-    } catch (error: any) {
-      debug('Workflow Dispatch error', error.message);
+    } catch (error) {
+      debug('Workflow Dispatch error', (error as Error).message);
       throw error;
     }
   }
@@ -93,7 +97,7 @@ export class WorkflowHandler {
         status: ofStatus(response.data.status),
         conclusion: ofConclusion(response.data.conclusion)
       };
-    } catch (error: any) {
+    } catch (error) {
       debug('Workflow Run status error', error);
       throw error;
     }
@@ -148,7 +152,7 @@ export class WorkflowHandler {
     try {
       let runs = await this.findAllWorkflowRuns();
       if (this.runName) {
-        runs = runs.filter((r: any) => r.name == this.runName);
+        runs = runs.filter((r) => r.name == this.runName);
       }
 
       if (runs.length == 0) {
@@ -157,7 +161,7 @@ export class WorkflowHandler {
 
       if (runs.length > 1) {
         core.warning(`Found ${runs.length} runs. Using the last one.`);
-        await this.debugFoundWorkflowRuns(runs);
+        this.debugFoundWorkflowRuns(runs);
       }
 
       this.workflowRunId = runs[0].id as number;
@@ -188,7 +192,7 @@ export class WorkflowHandler {
 
       // Locate workflow either by name or id
       const workflowFind = workflows.find(
-        (workflow: any) => workflow.name === this.workflowRef || workflow.id.toString() === this.workflowRef
+        (workflow) => workflow.name === this.workflowRef || workflow.id.toString() === this.workflowRef
       );
       if (!workflowFind)
         throw new Error(`Unable to find workflow '${this.workflowRef}' in ${this.owner}/${this.repo} 😥`);
@@ -205,10 +209,12 @@ export class WorkflowHandler {
     return /.+\.ya?ml$/.test(workflowRef);
   }
 
-  private debugFoundWorkflowRuns(runs: any) {
+
+
+  private debugFoundWorkflowRuns(runs: TRun[]) {
     debug(
       `Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`,
-      runs.map((r: any) => ({
+      runs.map((r) => ({
         id: r.id,
         name: r.name,
         created_at: r.created_at,
