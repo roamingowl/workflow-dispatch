@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check-typescript:
+    name: TypeScript Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check Format with prettier
+        id: npm-format-check
+        run: npm run format:check
+
+      - name: Lint with eslint
+        id: npm-lint
+        run: npm run lint
+
+  sonarcloud:
+    name: TypeScript Tests and SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm run ci-test
+
+      - name: coverage debug
+        run: |
+          echo "coverage"
+          ls -la coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  test-action-file:
+    name: GitHub Actions Test - render template from file
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action - render template from file
+        id: test-action
+        uses: ./
+        with:
+          template: examples/simple.eta
+          variables: |
+            name: 'John'
+
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action.outputs.text }}"
+
+  test-action-string:
+    name: GitHub Actions Test - render template from string
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action - render string
+        id: test-action
+        uses: ./
+        with:
+          template: |
+            hi this is <%= it.what %>
+          variables: |
+            what: 'a test'
+
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action.outputs.text }}"
