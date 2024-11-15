@@ -1,0 +1,52 @@
+name: Prepare metadata with multilevel support
+description: Get the current workflow run URL, which is not available by default in the GitHub Actions context
+inputs:
+  meta:
+    description: "Existing metadata JSON string"
+    required: false
+    default: ""
+
+outputs:
+  json:
+    description: "Updated metadata JSON string"
+    value: ${{ steps.script.outputs.result }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: script
+      uses: actions/github-script@v7
+      env:
+        META: ${{ inputs.meta }}
+      with:
+        script: |
+          let { META } = process.env
+
+          let metaData;
+
+          if (META === '') {
+            metaData = {};
+          } else {
+            metaData = JSON.parse(META);
+          }
+          
+          if (!Array.isArray(metaData.workflows)) {
+            metaData.workflows = []
+          }
+          
+          //some bug in the action https://github.com/actions/toolkit/blob/77f247b2f3e5d82ecd0e27573ef30c75d5d9a2cb/packages/github/src/context.ts#L48
+          //this should not be undefined
+          let attempt = context.runAttempt;
+          if (typeof attempt === 'undefined') {
+            attempt = 1;
+          }
+          
+          metaData.workflows.push(
+            {
+              "parent-workflow-name":`${context.workflow}`,
+              "parent-workflow-url":`${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/attempts/${attempt}`,
+              "parent-workflow-repo":`${context.repo.owner}/${context.repo.repo}`
+            }
+          );
+          
+          return JSON.stringify(metaData);

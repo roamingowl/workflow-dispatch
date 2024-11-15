@@ -78,6 +78,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Prepare meta data
+        id: meta
+        uses: ./.github/actions/prepare-meta
+
       - uses: ./
         with:
           workflow: dummy.yaml
