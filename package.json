@@ -3,7 +3,7 @@
   "description": "GitHub action to dispatch a workflow",
   "version": "0.0.1",
   "author": "romaingowl",
-  "type": "commonjs",
+  "type": "module",
   "private": true,
   "homepage": "https://github.com/roamingowl/workflow-dispatch",
   "repository": {
@@ -31,43 +31,16 @@
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
     "lint": "eslint .",
-    "package": "esbuild src/index.ts --bundle --platform=node --minify --target=node20 --metafile=meta.json --outfile=dist/index.js",
+    "package": "esbuild src/index.ts --bundle --platform=node --minify --target=node20 --metafile=meta.json  --outfile=dist/index.js",
     "build-license": "generate-license-file --input package.json --output dist/licenses.txt --overwrite",
-    "test": "jest"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest watch"
   },
   "license": "MIT",
-  "jest": {
-    "preset": "ts-jest",
-    "verbose": true,
-    "clearMocks": true,
-    "testEnvironment": "node",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "testMatch": [
-      "**/*.test.ts"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "coverageReporters": [
-      "json-summary",
-      "text",
-      "lcov"
-    ],
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "./src/**"
-    ]
-  },
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
+    "esbuild-jest": "^0.5.0",
     "pretty-ms": "^9.2.0",
     "yaml": "^2.6.0"
   },
@@ -75,6 +48,7 @@
     "@eslint/js": "^9.14.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.8.7",
+    "@vitest/coverage-v8": "^2.1.5",
     "esbuild": "^0.24.0",
     "eslint": "^9.14.0",
     "eslint-plugin-import": "^2.31.0",
@@ -85,6 +59,7 @@
     "prettier-eslint": "^16.3.0",
     "ts-jest": "^29.2.5",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.13.0"
+    "typescript-eslint": "^8.13.0",
+    "vitest": "^2.1.5"
   }
 }
