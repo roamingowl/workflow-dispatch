@@ -41,6 +41,17 @@ jobs:
         id: npm-lint
         run: npm run lint
 
+      - name: build
+        run: |
+          npm run bundle
+
+      - name: build meta artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build meta
+          path: meta.json
+          retention-days: 365
+
   sonarcloud:
     name: TS Tests and SonarCloud Scan
     runs-on: ubuntu-latest

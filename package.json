@@ -31,7 +31,7 @@
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
     "lint": "eslint .",
-    "package": "esbuild src/index.ts --bundle --platform=node --minify --target=node20 --outfile=dist/index.js",
+    "package": "esbuild src/index.ts --bundle --platform=node --minify --target=node20 --metafile=meta.json --outfile=dist/index.js",
     "build-license": "generate-license-file --input package.json --output dist/licenses.txt --overwrite",
     "test": "jest"
   },
