@@ -3,7 +3,6 @@
   "description": "GitHub action to dispatch a workflow",
   "version": "0.0.1",
   "author": "romaingowl",
-  "type": "module",
   "private": true,
   "homepage": "https://github.com/roamingowl/workflow-dispatch",
   "repository": {
@@ -31,7 +30,7 @@
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
     "lint": "eslint .",
-    "package": "esbuild src/index.ts --bundle --platform=node --format=iife --minify --target=node20 --metafile=meta.json  --outfile=dist/index.js",
+    "package": "esbuild src/index.ts --bundle --platform=node --minify --target=node20 --metafile=meta.json  --outfile=dist/index.js",
     "build-license": "generate-license-file --input package.json --output dist/licenses.txt --overwrite",
     "test": "vitest watch"
   },
