@@ -86,7 +86,7 @@ jobs:
           display-workflow-run-url: true
           inputs: |-
             {
-              "value": "test_value",
+              "value": "test_value"
             }
 
 
