@@ -23968,8 +23968,10 @@ function debug2(title, content) {
     try {
       core2.debug(JSON.stringify(content, null, 3));
     } catch (e) {
-      core2.debug(`Failed to serialize object, trying toString. Cause: ${e}`);
-      core2.debug(content?.toString());
+      core2.debug(`Failed to serialize object, trying toString. Cause: ${e.message}`);
+      if (typeof content === "object" && content?.toString) {
+        core2.debug(content?.toString());
+      }
     }
     core2.info("::endgroup::");
   }
@@ -24107,7 +24109,7 @@ var WorkflowHandler = class {
       }
       if (runs.length > 1) {
         core3.warning(`Found ${runs.length} runs. Using the last one.`);
-        await this.debugFoundWorkflowRuns(runs);
+        this.debugFoundWorkflowRuns(runs);
       }
       this.workflowRunId = runs[0].id;
       return this.workflowRunId;
@@ -24322,8 +24324,8 @@ async function handleLogs(args, workflowHandler) {
   try {
     const workflowRunId = await workflowHandler.getWorkflowRunId();
     await handleWorkflowLogsPerJob(args, workflowRunId);
-  } catch (e) {
-    core5.error(`Failed to handle logs of triggered workflow. Cause: ${e}`);
+  } catch (error2) {
+    core5.error(`Failed to handle logs of triggered workflow. Cause: ${error2.message}`);
   }
 }
 async function run() {
@@ -24361,7 +24363,6 @@ async function run() {
     core5.setFailed(error2.message);
   }
 }
-run();
 
 // src/index.ts
 run();

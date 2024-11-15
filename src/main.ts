@@ -110,8 +110,3 @@ export async function run(): Promise<void> {
     core.setFailed((error as Error).message);
   }
 }
-
-//
-// Call the main task run function
-//
-run();
