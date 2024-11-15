@@ -83,6 +83,29 @@ jobs:
         id: meta
         uses: ./.github/actions/prepare-meta
 
+      - name: Merge inputs
+        id: merge-inputs
+        env:
+          META_JSON: ${{ steps.meta.outputs.json }}
+          WORKFLOW_INPUTS_JSON: |
+            {
+              "value": "test_value"
+            }
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { META_JSON, WORKFLOW_INPUTS_JSON } = process.env;
+
+            const parsedInputs = JSON.parse(WORKFLOW_INPUTS_JSON);
+            const parsedMeta = JSON.parse(JSON.parse(META_JSON));
+
+            console.log(`[DEBUG]Parsed inputs: ${JSON.stringify(parsedInputs)}`);
+            console.log(`[DEBUG]Parsed meta: ${JSON.stringify(parsedMeta)}`);
+
+            const inputs = {...parsedInputs, meta: JSON.stringify({...parsedMeta})}; 
+
+            return JSON.stringify(inputs);
+
       - uses: ./
         with:
           workflow: dummy.yaml
@@ -90,9 +113,7 @@ jobs:
           wait-for-completion: true
           display-workflow-run-url: true
           inputs: |-
-            {
-              "value": "test_value"
-            }
+            ${{ fromJSON(steps.merge-inputs.outputs.result) }}
 
 
 
