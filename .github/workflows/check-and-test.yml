@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   check-typescript:
@@ -71,4 +72,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          inputs: |-
+            {
+              "value": "test_value",
+            }
+
+
 

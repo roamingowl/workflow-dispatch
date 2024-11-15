@@ -1,0 +1,50 @@
+name: Print parent workflow info to job summary with multilevel support
+description: Print parent workflow info to job summary with multilevel support
+inputs:
+  meta:
+    description: "Metadata JSON in specific format"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - id: script
+      uses: actions/github-script@v7
+      env:
+        META: ${{ inputs.meta }}
+      with:
+        script: |
+          let { META } = process.env
+
+          let metaData;
+
+          if (META === '') {
+            return '';
+          } else {
+            metaData = JSON.parse(META);
+          }
+          
+          if (!Array.isArray(metaData.workflows)) {
+            return '';
+          }
+          
+          let summary = 'Dispatch breadcrumbs:\n';
+          
+          metaData.workflows.forEach((workflow) => {
+            summary += `- [${workflow['parent-workflow-name']}](${workflow['parent-workflow-url']})\n`;
+          });
+          
+          summary += '- this workflow\n';
+          
+          return summary;
+
+    - name: Print parent workflow info
+      if: ${{ steps.script.outputs.result != '' }}
+      env:
+        MESSAGE: ${{ fromJSON(steps.script.outputs.result) }}
+      shell: bash
+      run: |
+        while IFS= read -r line; do
+          echo $line >> $GITHUB_STEP_SUMMARY
+        done <<< "$MESSAGE"  
