@@ -50,7 +50,7 @@ jobs:
         with:
           name: Build meta
           path: meta.json
-          retention-days: 365
+          retention-days: 90
 
   sonarcloud:
     name: TS Tests and SonarCloud Scan
