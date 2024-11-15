@@ -3,7 +3,7 @@
   "description": "GitHub action to dispatch a workflow",
   "version": "0.0.1",
   "author": "romaingowl",
-  "type": "module",
+  "type": "commonjs",
   "private": true,
   "homepage": "https://github.com/roamingowl/workflow-dispatch",
   "repository": {
