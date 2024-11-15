@@ -1,6 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
 import { debug } from './debug';
+import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
 
 export enum WorkflowRunStatus {
   QUEUED = 'queued',
@@ -103,27 +105,27 @@ export class WorkflowHandler {
     }
   }
 
-  async getWorkflowRunArtifacts(): Promise<WorkflowRunResult> {
-    try {
-      const runId = await this.getWorkflowRunId();
-      const response = await this.octokit.rest.actions.getWorkflowRunArtifacts({
-        owner: this.owner,
-        repo: this.repo,
-        run_id: runId
-      });
-      debug('Workflow Run artifacts', response);
-
-      return {
-        id: runId,
-        url: response.data.html_url,
-        status: ofStatus(response.data.status),
-        conclusion: ofConclusion(response.data.conclusion)
-      };
-    } catch (error) {
-      debug('Workflow Run artifacts error', error);
-      throw error;
-    }
-  }
+  // async getWorkflowRunArtifacts(): Promise<WorkflowRunResult> {
+  //   try {
+  //     const runId = await this.getWorkflowRunId();
+  //     const response = await this.octokit.rest.actions.getWorkflowRunArtifacts({
+  //       owner: this.owner,
+  //       repo: this.repo,
+  //       run_id: runId
+  //     });
+  //     debug('Workflow Run artifacts', response);
+  //
+  //     return {
+  //       id: runId,
+  //       url: response.data.html_url,
+  //       status: ofStatus(response.data.status),
+  //       conclusion: ofConclusion(response.data.conclusion)
+  //     };
+  //   } catch (error) {
+  //     debug('Workflow Run artifacts error', error);
+  //     throw error;
+  //   }
+  // }
 
   private async findAllWorkflowRuns() {
     try {
@@ -209,7 +211,9 @@ export class WorkflowHandler {
     return /.+\.ya?ml$/.test(workflowRef);
   }
 
-  private debugFoundWorkflowRuns(runs: TRun[]) {
+  private debugFoundWorkflowRuns(
+    runs: RestEndpointMethodTypes['actions']['listWorkflowRuns']['response']['data']['workflow_runs']
+  ) {
     debug(
       `Filtered Workflow Runs (after trigger date: ${new Date(this.triggerDate).toISOString()})`,
       runs.map(r => ({

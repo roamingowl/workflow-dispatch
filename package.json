@@ -26,7 +26,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "bundle": "npm run format:write && npm run package && npm run build-license",
+    "bundle": "npm run format:write && tsc -noEmit && npm run package && npm run build-license",
     "ci-test": "jest --coverage",
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
@@ -68,7 +68,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
-    "yaml": "2.6.0"
+    "yaml": "^2.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
