@@ -1,16 +1,13 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { debug } from './debug';
 import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
+import { debug } from './debug';
 
 export enum WorkflowRunStatus {
   QUEUED = 'queued',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed'
 }
-
-type TRun = { id: number; name: string; created_at: string };
 
 const ofStatus = (status: string | null): WorkflowRunStatus => {
   if (!status) {
