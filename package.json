@@ -27,14 +27,13 @@
   },
   "scripts": {
     "bundle": "npm run format:write && tsc -noEmit && npm run package && npm run build-license",
-    "ci-test": "jest --coverage",
+    "ci-test": "vitest run --coverage",
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
     "lint": "eslint .",
     "package": "esbuild src/index.ts --bundle --platform=node --minify --target=node20 --metafile=meta.json  --outfile=dist/index.js",
     "build-license": "generate-license-file --input package.json --output dist/licenses.txt --overwrite",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest watch"
+    "test": "vitest watch"
   },
   "license": "MIT",
   "dependencies": {
