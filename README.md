@@ -29,5 +29,9 @@ JavaScript action (written in TypeScript) to dispatch a workflow with a given in
 
 ...
 
+# Issues
+
+This whole project have to be in commonJs because [GitHub actions don't support ES6 modules](https://github.com/actions/github-script/issues/457).
+
 # License
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
