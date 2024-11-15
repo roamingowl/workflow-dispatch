@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
-import { formatDuration, getArgs, isTimedOut, sleep } from './utils';
+import prettyMs from 'pretty-ms';
+import { getArgs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
 import { TArgs } from './types';
@@ -32,9 +33,9 @@ async function waitForCompletionOrTimeout(
     try {
       result = await workflowHandler.getWorkflowRunStatus();
       status = result.status;
-      core.debug(`Worflow is running for ${formatDuration(Date.now() - start)}. Current status=${status}`);
-    } catch (e) {
-      core.warning(`Failed to get workflow status: ${(e as Error).message}`);
+      core.debug(`Workflow is running for ${prettyMs(Date.now() - start)}. Current status: ${status}`);
+    } catch (error) {
+      core.warning(`Failed to get workflow status: ${(error as Error).message}`);
     }
   } while (status !== WorkflowRunStatus.COMPLETED && !isTimedOut(start, waitForCompletionTimeout));
   return { result, start };

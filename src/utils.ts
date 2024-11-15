@@ -77,25 +77,3 @@ export function sleep(ms: number) {
 export function isTimedOut(start: number, waitForCompletionTimeout: number) {
   return Date.now() > start + waitForCompletionTimeout;
 }
-
-export function formatDuration(duration: number) {
-  const durationSeconds = duration / 1000;
-  const hours = Math.floor(durationSeconds / 3600);
-  const minutes = Math.floor((durationSeconds - hours * 3600) / 60);
-  const seconds = durationSeconds - hours * 3600 - minutes * 60;
-
-  let hoursStr = hours + '';
-  let minutesStr = minutes + '';
-  let secondsStr = seconds + '';
-
-  if (hours < 10) {
-    hoursStr = '0' + hoursStr;
-  }
-  if (minutes < 10) {
-    minutesStr = '0' + minutesStr;
-  }
-  if (seconds < 10) {
-    secondsStr = '0' + secondsStr;
-  }
-  return hoursStr + 'h ' + minutesStr + 'm ' + secondsStr + 's';
-}

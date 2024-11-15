@@ -68,6 +68,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
+    "pretty-ms": "^9.2.0",
     "yaml": "^2.6.0"
   },
   "devDependencies": {
