@@ -58,7 +58,6 @@ export class WorkflowHandler {
     private ref: string,
     private runName: string
   ) {
-    // Get octokit client for making API calls
     this.octokit = github.getOctokit(token);
   }
 
@@ -71,7 +70,7 @@ export class WorkflowHandler {
         repo: this.repo,
         workflow_id: workflowId,
         ref: this.ref,
-        inputs
+        workflowInputs: inputs
       });
       debug('Workflow Dispatch', dispatchResp);
     } catch (error) {

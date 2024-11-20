@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import prettyMs from 'pretty-ms';
-import { getArgs, isTimedOut, sleep } from './utils';
+import { getInputs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
 import { TArgs } from './types';
@@ -66,47 +66,60 @@ async function handleLogs(args: TArgs, workflowHandler: WorkflowHandler) {
   }
 }
 
-//
-// Main task function (async wrapper)
-//
 export async function run(): Promise<void> {
   try {
-    const args = getArgs();
-    const workflowHandler = new WorkflowHandler(
-      args.token,
-      args.workflowRef,
-      args.owner,
-      args.repo,
-      args.ref,
-      args.runName
-    );
+    const {
+      token,
+      workflowRef,
+      owner,
+      repo,
+      ref,
+      runName,
+      workflowInputs,
+      displayWorkflowUrl,
+      workflowLogMode,
+      waitForCompletionTimeout,
+      checkStatusInterval,
+      displayWorkflowUrlInterval,
+      waitForCompletion,
+      displayWorkflowUrlTimeout
+    } = getInputs();
 
-    // Trigger workflow run
-    await workflowHandler.triggerWorkflow(args.inputs);
+    const workflowHandler = new WorkflowHandler(token, workflowRef, owner, repo, ref, runName);
+
+    await workflowHandler.triggerWorkflow(workflowInputs);
     core.info('Workflow triggered 🚀');
 
-    if (args.displayWorkflowUrl) {
-      const url = await getFollowUrl(workflowHandler, args.displayWorkflowUrlInterval, args.displayWorkflowUrlTimeout);
+    if (displayWorkflowUrl) {
+      const url = await getFollowUrl(workflowHandler, displayWorkflowUrlInterval, displayWorkflowUrlTimeout);
       core.info(`You can follow the running workflow here: ${url}`);
       core.setOutput('workflow-url', url);
     }
 
-    if (!args.waitForCompletion) {
+    if (!waitForCompletion) {
       return;
     }
 
     core.info('Waiting for workflow completion');
     const { result, start } = await waitForCompletionOrTimeout(
       workflowHandler,
-      args.checkStatusInterval,
-      args.waitForCompletionTimeout
+      checkStatusInterval,
+      waitForCompletionTimeout
     );
 
-    await handleLogs(args, workflowHandler);
+    await handleLogs(
+      {
+        token,
+        owner,
+        repo,
+        workflowLogMode
+      },
+      workflowHandler
+    );
 
     core.setOutput('workflow-id', result?.id);
     core.setOutput('workflow-url', result?.url);
-    computeConclusion(start, args.waitForCompletionTimeout, result);
+    computeConclusion(start, waitForCompletionTimeout, result);
   } catch (error) {
     core.setFailed((error as Error).message);
   }

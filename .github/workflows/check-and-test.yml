@@ -84,8 +84,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  test:
-    name: Test
+  test-json:
+    name: Test JSON
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -117,14 +117,25 @@ jobs:
 
             return JSON.stringify(inputs);
 
+  test-yaml:
+    name: Test YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - uses: ./
         with:
           workflow: dummy.yaml
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
-          inputs: |-
-            ${{ fromJSON(steps.merge-inputs.outputs.result) }}
+          inputs: |
+            meta:
+              workflows:
+                - parent-workflow-name: ${{context.workflow}}`,
+                  parent-workflow-url: ${{context.serverUrl}}/${{context.repo.owner}}/${{context.repo.repo}}/actions/runs/${{context.runId}}/attempts/${{congext.runAttempt}}`,
+                  parent-workflow-repo: ${{context.repo.owner}}/${{context.repo.repo}}
+            value: test_value  
 
 
 

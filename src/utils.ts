@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import YAML from 'yaml';
 
 enum TimeUnit {
   S = 1000,
@@ -17,28 +18,45 @@ function toMilliseconds(timeWithUnit: string): number {
   return time * unit;
 }
 
-function parse(inputsJson: string) {
-  if (inputsJson) {
-    try {
-      return JSON.parse(inputsJson);
-    } catch (e) {
-      throw new Error(`Failed to parse 'inputs' parameter. Must be a valid JSON.\nCause: ${e}`);
-    }
+export function parseWorkflowInputs(inputsJsonOrYaml: string) {
+  if (inputsJsonOrYaml === '') {
+    core.debug('No inputs provided');
+    return {};
   }
-  return {};
+  let parsedInputs: unknown = undefined;
+
+  core.debug('Parsing inputs as JSON');
+  try {
+    parsedInputs = JSON.parse(inputsJsonOrYaml);
+    if (typeof parsedInputs === 'object') {
+      core.debug('Inputs parsed as JSON');
+      return parsedInputs;
+    }
+  } catch (error) {
+    core.debug(`Failed to parse inputs as JSON: ${(error as Error).message}`);
+  }
+
+  core.debug('Parsing inputs as YAML');
+  parsedInputs = YAML.parse(inputsJsonOrYaml);
+  if (typeof parsedInputs !== 'object') {
+    const error = new TypeError('Parsed inputs are not an object');
+    core.setFailed(error);
+    throw error
+  }
+  core.debug('Inputs parsed as YAML');
+  return parsedInputs;
 }
-export function getArgs() {
-  // Required inputs
-  const token = core.getInput('token');
-  const workflowRef = core.getInput('workflow');
-  // Optional inputs, with defaults
+export function getInputs() {
+  const token = core.getInput('token', { required: true });
+  const workflowRef = core.getInput('workflow', { required: true });
+
   const ref = core.getInput('ref') || github.context.ref;
   const [owner, repo] = core.getInput('repo')
     ? core.getInput('repo').split('/')
     : [github.context.repo.owner, github.context.repo.repo];
 
   // Decode inputs, this MUST be a valid JSON string
-  const inputs = parse(core.getInput('inputs'));
+  const inputs = parseWorkflowInputs(core.getInput('inputs'));
 
   const displayWorkflowUrlStr = core.getInput('display-workflow-run-url');
   const displayWorkflowUrl = displayWorkflowUrlStr && displayWorkflowUrlStr === 'true';
@@ -58,7 +76,7 @@ export function getArgs() {
     ref,
     owner,
     repo,
-    inputs,
+    workflowInputs: inputs,
     displayWorkflowUrl,
     displayWorkflowUrlTimeout,
     displayWorkflowUrlInterval,
