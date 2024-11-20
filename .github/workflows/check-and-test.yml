@@ -132,9 +132,9 @@ jobs:
           inputs: |
             meta:
               workflows:
-                - parent-workflow-name: ${{context.workflow}}`,
-                  parent-workflow-url: ${{context.serverUrl}}/${{context.repo.owner}}/${{context.repo.repo}}/actions/runs/${{context.runId}}/attempts/${{congext.runAttempt}}`,
-                  parent-workflow-repo: ${{context.repo.owner}}/${{context.repo.repo}}
+                - parent-workflow-name: ${{ github.workflow }}`,
+                  parent-workflow-url: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${github.run_attempt}}`,
+                  parent-workflow-repo: ${{ github.repository }}
             value: test_value  
 
 
