@@ -139,6 +139,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |
             meta:
               workflows:
