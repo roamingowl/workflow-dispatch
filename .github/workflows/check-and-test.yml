@@ -117,6 +117,16 @@ jobs:
 
             return JSON.stringify(inputs);
 
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          inputs: |-
+            ${{ fromJSON(steps.merge-inputs.outputs.result) }}
+
+
   test-yaml:
     name: Test YAML
     runs-on: ubuntu-latest
