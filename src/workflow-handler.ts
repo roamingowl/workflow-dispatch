@@ -68,7 +68,7 @@ export class WorkflowHandler {
         repo: this.repo,
         workflow_id: workflowId,
         ref: this.ref,
-        workflowInputs: inputs
+        inputs
       });
       debug('Workflow Dispatch', dispatchResp);
     } catch (error) {
