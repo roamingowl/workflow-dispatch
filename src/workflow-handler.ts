@@ -42,8 +42,6 @@ export interface WorkflowRunResult {
   conclusion: WorkflowRunConclusion;
 }
 
-type TInputs = Record<string, string>;
-
 export class WorkflowHandler {
   private octokit: ReturnType<typeof github.getOctokit>;
   private workflowId?: number | string;
@@ -61,7 +59,7 @@ export class WorkflowHandler {
     this.octokit = github.getOctokit(token);
   }
 
-  async triggerWorkflow(inputs: TInputs) {
+  async triggerWorkflow(inputs: { [key: string]: unknown }) {
     try {
       const workflowId = await this.getWorkflowId();
       this.triggerDate = new Date().setMilliseconds(0);

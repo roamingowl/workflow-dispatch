@@ -41,7 +41,7 @@ export function parseWorkflowInputs(inputsJsonOrYaml: string) {
   if (typeof parsedInputs !== 'object') {
     const error = new TypeError('Parsed inputs are not an object');
     core.setFailed(error);
-    throw error
+    throw error;
   }
   core.debug('Inputs parsed as YAML');
   return parsedInputs;
@@ -76,7 +76,7 @@ export function getInputs() {
     ref,
     owner,
     repo,
-    workflowInputs: inputs,
+    workflowInputs: inputs as { [key: string]: unknown },
     displayWorkflowUrl,
     displayWorkflowUrlTimeout,
     displayWorkflowUrlInterval,
