@@ -23,7 +23,7 @@ export function parseWorkflowInputs(inputsJsonOrYaml: string) {
     core.debug('No inputs provided');
     return {};
   }
-  let parsedInputs: unknown = undefined;
+  let parsedInputs: unknown | {meta: unknown} = undefined;
 
   core.debug('Parsing inputs as JSON');
   try {
@@ -44,6 +44,11 @@ export function parseWorkflowInputs(inputsJsonOrYaml: string) {
     throw error;
   }
   core.debug('Inputs parsed as YAML');
+  // @ts-ignore
+  if (parsedInputs?.meta) {
+    // @ts-ignore
+    parsedInputs.meta = JSON.stringify(parsedInputs.meta);
+  }
   return parsedInputs;
 }
 export function getInputs() {
