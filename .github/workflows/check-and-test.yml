@@ -149,5 +149,27 @@ jobs:
                   parent-workflow-repo: ${{ github.repository }}
             value: test_value  
 
+  test-yaml-with-logs:
+    name: Test YAML with logs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          workflow-logs: print
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            meta:
+              workflows:
+                - parent-workflow-name: ${{ github.workflow }}`,
+                  parent-workflow-url: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${{github.run_attempt}}`,
+                  parent-workflow-repo: ${{ github.repository }}
+            value: test_value  
+
 
 
