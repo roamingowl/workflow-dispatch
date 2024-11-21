@@ -18,16 +18,18 @@ function toMilliseconds(timeWithUnit: string): number {
   return time * unit;
 }
 
+type TParsedWorkflowInputs = { [key: string]: unknown } | { meta: unknown };
+
 export function parseWorkflowInputs(inputsJsonOrYaml: string) {
   if (inputsJsonOrYaml === '') {
     core.debug('No inputs provided');
     return {};
   }
-  let parsedInputs: unknown | {meta: unknown} = undefined;
+  let parsedInputs: unknown | { meta: unknown } = undefined;
 
   core.debug('Parsing inputs as JSON');
   try {
-    parsedInputs = JSON.parse(inputsJsonOrYaml);
+    parsedInputs = JSON.parse(inputsJsonOrYaml) as TParsedWorkflowInputs;
     if (typeof parsedInputs === 'object') {
       core.debug('Inputs parsed as JSON');
       return parsedInputs;
@@ -44,10 +46,9 @@ export function parseWorkflowInputs(inputsJsonOrYaml: string) {
     throw error;
   }
   core.debug('Inputs parsed as YAML');
-  // @ts-ignore
-  if (parsedInputs?.meta) {
-    // @ts-ignore
-    parsedInputs.meta = JSON.stringify(parsedInputs.meta);
+  const meta = (parsedInputs as TParsedWorkflowInputs)?.meta;
+  if (meta) {
+    (parsedInputs as TParsedWorkflowInputs).meta = JSON.stringify(meta);
   }
   return parsedInputs;
 }
