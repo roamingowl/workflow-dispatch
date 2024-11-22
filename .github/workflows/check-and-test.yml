@@ -166,6 +166,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
+          run-name: dummy-with-logs
           workflow-logs: print
           print-step-summary: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
