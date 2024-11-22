@@ -5,6 +5,7 @@ import { getInputs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
 import { TArgs } from './types';
+import { printSummary } from './summary';
 
 async function getFollowUrl(workflowHandler: WorkflowHandler, interval: number, timeout: number) {
   const start = Date.now();
@@ -65,27 +66,6 @@ async function handleLogs(args: TArgs, workflowHandler: WorkflowHandler) {
   } catch (error) {
     core.error(`Failed to handle logs of triggered workflow. Cause: ${(error as Error).message}`);
   }
-}
-
-async function printSummary(
-  runName: string,
-  url: string | undefined,
-  repo: string,
-  waitForCompletion: boolean,
-  displayWorkflowUrl: boolean,
-  stepSummaryTemplate: string
-) {
-  const eta = new Eta();
-  const templateData = {
-    dispatchedWorkflow: { name: runName, url },
-    dispatchingWorkflow: { repo: { name: repo } },
-    waitForCompletion,
-    displayWorkflowUrl
-  };
-  const summary = eta.renderString(stepSummaryTemplate, templateData);
-  console.log(summary);
-  await core.summary.addRaw(summary).write();
-  core.setOutput('step-summary-markdown', summary);
 }
 
 export async function run(): Promise<void> {
@@ -151,7 +131,7 @@ export async function run(): Promise<void> {
     computeConclusion(start, waitForCompletionTimeout, result);
     console.log('Print summary', printStepSummary);
     if (printStepSummary) {
-      await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
+      await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate, result?.conclusion);
     }
   } catch (error) {
     core.setFailed((error as Error).message);
