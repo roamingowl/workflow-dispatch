@@ -102,7 +102,7 @@ export async function run(): Promise<void> {
 
     if (!waitForCompletion) {
       if (printStepSummary) {
-        await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
+        await printSummary(workflowRef, url, `${owner}/${repo}`, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
       }
       return;
     }
@@ -131,9 +131,9 @@ export async function run(): Promise<void> {
     console.log('Print summary', printStepSummary);
     if (printStepSummary) {
       await printSummary(
-        runName,
+        workflowRef,
         url,
-        repo,
+        `${owner}/${repo}`,
         waitForCompletion,
         displayWorkflowUrl,
         stepSummaryTemplate,

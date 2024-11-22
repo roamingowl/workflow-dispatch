@@ -3,7 +3,7 @@ import * as core from '@actions/core';
 import { context } from '@actions/github';
 
 export async function printSummary(
-  runName: string,
+  workflow: string,
   url: string | undefined,
   repo: string,
   waitForCompletion: boolean,
@@ -13,7 +13,7 @@ export async function printSummary(
 ) {
   const eta = new Eta();
   const templateData = {
-    dispatchedWorkflow: { name: runName, url, repo: { name: repo }, conclusion },
+    dispatchedWorkflow: { name: workflow, url, repo: { name: repo }, conclusion },
     dispatchingWorkflow: { repo: { name: `${context.repo.owner}/${context.repo.repo}` } },
     waitForCompletion,
     displayWorkflowUrl
