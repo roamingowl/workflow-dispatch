@@ -83,6 +83,8 @@ outputs:
       Logs of the triggered workflow. Based on `inputs.workflow-logs`, format is set to:
         - `output`: Multiline logs formatted as: '<job-name> | <datetime> <message>'
         - `json-output`: JSON logs formatted as: '{"<job-name>": [{"<datetime>": "<message>"}]'
+  step-summary-markdown:
+    description: 'Summary of the step in markdown format'
 
 runs:
   using: node20

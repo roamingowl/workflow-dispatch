@@ -1,7 +1,8 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import YAML from 'yaml';
-import {toMs} from 'ms-typescript';
+import { toMs } from 'ms-typescript';
+import { DEFAULT_JOB_SUMMARY_TEMPLATE } from './templates/summary';
 
 type TParsedWorkflowInputs = { [key: string]: unknown } | { meta?: unknown };
 
@@ -49,17 +50,22 @@ export function getInputs() {
   // Decode inputs, this MUST be a valid JSON string
   const inputs = parseWorkflowInputs(core.getInput('inputs'));
 
-  const displayWorkflowUrlStr = core.getInput('display-workflow-run-url');
-  const displayWorkflowUrl = displayWorkflowUrlStr && displayWorkflowUrlStr === 'true';
+  const displayWorkflowUrl = core.getInput('display-workflow-run-url') === 'true';
   const displayWorkflowUrlTimeout = toMs(core.getInput('display-workflow-run-url-timeout'));
   const displayWorkflowUrlInterval = toMs(core.getInput('display-workflow-run-url-interval'));
 
-  const waitForCompletionStr = core.getInput('wait-for-completion');
-  const waitForCompletion = waitForCompletionStr && waitForCompletionStr === 'true';
+  const waitForCompletion = core.getInput('wait-for-completion') === 'true';
   const waitForCompletionTimeout = toMs(core.getInput('wait-for-completion-timeout'));
   const checkStatusInterval = toMs(core.getInput('wait-for-completion-interval'));
   const runName = core.getInput('run-name');
   const workflowLogMode = core.getInput('workflow-logs');
+  const printStepSummary = core.getInput('print-step-summary') === 'true';
+  const stepSummaryTemplateString = core.getInput('step-summary-template');
+
+  let stepSummaryTemplate = DEFAULT_JOB_SUMMARY_TEMPLATE;
+  if (stepSummaryTemplateString !== '') {
+    stepSummaryTemplate = stepSummaryTemplateString;
+  }
 
   return {
     token,
@@ -75,7 +81,9 @@ export function getInputs() {
     waitForCompletion,
     waitForCompletionTimeout,
     runName,
-    workflowLogMode
+    workflowLogMode,
+    printStepSummary,
+    stepSummaryTemplate
   };
 }
 

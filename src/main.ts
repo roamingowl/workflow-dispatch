@@ -4,6 +4,7 @@ import { getInputs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
 import { TArgs } from './types';
+import { Eta } from 'eta';
 
 async function getFollowUrl(workflowHandler: WorkflowHandler, interval: number, timeout: number) {
   const start = Date.now();
@@ -66,6 +67,18 @@ async function handleLogs(args: TArgs, workflowHandler: WorkflowHandler) {
   }
 }
 
+async function printSummary(runName: string, url: string | undefined, repo:string, waitForCompletion: boolean, displayWorkflowUrl: boolean, stepSummaryTemplate:string) {
+  const eta = new Eta();
+  const templateData = {
+    dispatchedWorkflow: { name: runName, url },
+    dispatchingWorkflow: { repo: { name: repo } },
+    waitForCompletion,
+    displayWorkflowUrl
+  }
+  const summary = eta.renderString(stepSummaryTemplate, templateData);
+  await core.summary.addRaw(summary).write();
+}
+
 export async function run(): Promise<void> {
   try {
     const {
@@ -82,7 +95,9 @@ export async function run(): Promise<void> {
       checkStatusInterval,
       displayWorkflowUrlInterval,
       waitForCompletion,
-      displayWorkflowUrlTimeout
+      displayWorkflowUrlTimeout,
+      printStepSummary,
+      stepSummaryTemplate
     } = getInputs();
 
     const workflowHandler = new WorkflowHandler(token, workflowRef, owner, repo, ref, runName);
@@ -90,13 +105,25 @@ export async function run(): Promise<void> {
     await workflowHandler.triggerWorkflow(workflowInputs);
     core.info('Workflow triggered 🚀');
 
+    const url = await getFollowUrl(workflowHandler, displayWorkflowUrlInterval, displayWorkflowUrlTimeout);
     if (displayWorkflowUrl) {
-      const url = await getFollowUrl(workflowHandler, displayWorkflowUrlInterval, displayWorkflowUrlTimeout);
       core.info(`You can follow the running workflow here: ${url}`);
       core.setOutput('workflow-url', url);
     }
 
     if (!waitForCompletion) {
+      if (printStepSummary) {
+        await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
+        const eta = new Eta();
+        const templateData = {
+          dispatchedWorkflow: { name: runName, url },
+          dispatchingWorkflow: { repo: { name: repo } },
+          waitForCompletion,
+          displayWorkflowUrl
+        }
+        const summary = eta.renderString(stepSummaryTemplate, templateData);
+        await core.summary.addRaw(summary).write();
+      }
       return;
     }
 
@@ -120,6 +147,9 @@ export async function run(): Promise<void> {
     core.setOutput('workflow-id', result?.id);
     core.setOutput('workflow-url', result?.url);
     computeConclusion(start, waitForCompletionTimeout, result);
+    if (printStepSummary) {
+      await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
+    }
   } catch (error) {
     core.setFailed((error as Error).message);
   }
