@@ -10,7 +10,7 @@ on:
       - main
 
 concurrency:
-  group: "${{ githu.ref  }}-${{ github.workflow }}"
+  group: "${{ github.ref  }}-${{ github.workflow }}"
   cancel-in-progress: true
 
 permissions:
