@@ -209,7 +209,7 @@ Workflow <%~ it.dispatchedWorkflow.name %> has been triggered.
 > [!NOTE]
 > The dispatched workflow is from a different repository [<%~ it.dispatchedWorkflow.repo.name %>](<%~ it.dispatchedWorkflow.repo.url %>).
   
-  
+
 <% } %>
 <%- if (it.waitForCompletion) { -%>
 <%- if (it.dispatchedWorkflow.conclusion == 'success') { -%>
