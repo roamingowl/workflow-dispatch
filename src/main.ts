@@ -1,6 +1,5 @@
 import * as core from '@actions/core';
 import prettyMs from 'pretty-ms';
-import { Eta } from 'eta';
 import { getInputs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
@@ -131,7 +130,15 @@ export async function run(): Promise<void> {
     computeConclusion(start, waitForCompletionTimeout, result);
     console.log('Print summary', printStepSummary);
     if (printStepSummary) {
-      await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate, result?.conclusion);
+      await printSummary(
+        runName,
+        url,
+        repo,
+        waitForCompletion,
+        displayWorkflowUrl,
+        stepSummaryTemplate,
+        result?.conclusion
+      );
     }
   } catch (error) {
     core.setFailed((error as Error).message);
