@@ -102,7 +102,14 @@ export async function run(): Promise<void> {
 
     if (!waitForCompletion) {
       if (printStepSummary) {
-        await printSummary(workflowRef, url, `${owner}/${repo}`, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
+        await printSummary(
+          workflowRef,
+          url,
+          `${owner}/${repo}`,
+          waitForCompletion,
+          displayWorkflowUrl,
+          stepSummaryTemplate
+        );
       }
       return;
     }
