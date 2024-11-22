@@ -67,16 +67,25 @@ async function handleLogs(args: TArgs, workflowHandler: WorkflowHandler) {
   }
 }
 
-async function printSummary(runName: string, url: string | undefined, repo:string, waitForCompletion: boolean, displayWorkflowUrl: boolean, stepSummaryTemplate:string) {
+async function printSummary(
+  runName: string,
+  url: string | undefined,
+  repo: string,
+  waitForCompletion: boolean,
+  displayWorkflowUrl: boolean,
+  stepSummaryTemplate: string
+) {
   const eta = new Eta();
   const templateData = {
     dispatchedWorkflow: { name: runName, url },
     dispatchingWorkflow: { repo: { name: repo } },
     waitForCompletion,
     displayWorkflowUrl
-  }
+  };
   const summary = eta.renderString(stepSummaryTemplate, templateData);
+  console.log(summary);
   await core.summary.addRaw(summary).write();
+  core.setOutput('step-summary-markdown', summary);
 }
 
 export async function run(): Promise<void> {
@@ -105,8 +114,9 @@ export async function run(): Promise<void> {
     await workflowHandler.triggerWorkflow(workflowInputs);
     core.info('Workflow triggered 🚀');
 
-    const url = await getFollowUrl(workflowHandler, displayWorkflowUrlInterval, displayWorkflowUrlTimeout);
+    let url: string | undefined = '';
     if (displayWorkflowUrl) {
+      url = await getFollowUrl(workflowHandler, displayWorkflowUrlInterval, displayWorkflowUrlTimeout);
       core.info(`You can follow the running workflow here: ${url}`);
       core.setOutput('workflow-url', url);
     }
@@ -114,15 +124,6 @@ export async function run(): Promise<void> {
     if (!waitForCompletion) {
       if (printStepSummary) {
         await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
-        const eta = new Eta();
-        const templateData = {
-          dispatchedWorkflow: { name: runName, url },
-          dispatchingWorkflow: { repo: { name: repo } },
-          waitForCompletion,
-          displayWorkflowUrl
-        }
-        const summary = eta.renderString(stepSummaryTemplate, templateData);
-        await core.summary.addRaw(summary).write();
       }
       return;
     }
@@ -146,7 +147,9 @@ export async function run(): Promise<void> {
 
     core.setOutput('workflow-id', result?.id);
     core.setOutput('workflow-url', result?.url);
+
     computeConclusion(start, waitForCompletionTimeout, result);
+    console.log('Print summary', printStepSummary);
     if (printStepSummary) {
       await printSummary(runName, url, repo, waitForCompletion, displayWorkflowUrl, stepSummaryTemplate);
     }
