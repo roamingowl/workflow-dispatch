@@ -1,10 +1,10 @@
 import * as core from '@actions/core';
 import prettyMs from 'pretty-ms';
+import { Eta } from 'eta';
 import { getInputs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
 import { TArgs } from './types';
-import { Eta } from 'eta';
 
 async function getFollowUrl(workflowHandler: WorkflowHandler, interval: number, timeout: number) {
   const start = Date.now();
