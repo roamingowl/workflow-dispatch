@@ -18,6 +18,7 @@ export async function printSummary(
     waitForCompletion,
     displayWorkflowUrl
   };
+  console.log('Template data:', JSON.stringify(templateData, null, 2));
   const summary = eta.renderString(stepSummaryTemplate, templateData);
   console.log(summary);
   await core.summary.addRaw(summary).write();

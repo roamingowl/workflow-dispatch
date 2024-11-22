@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   check-typescript:
-    name: TypeScript Checks
+    name: TS format and lint
     runs-on: ubuntu-latest
 
     steps:
@@ -53,7 +53,7 @@ jobs:
           retention-days: 90
 
   sonarcloud:
-    name: TS Tests and SonarCloud Scan
+    name: Unit tests and SonarCloud Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
