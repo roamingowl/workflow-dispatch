@@ -1,24 +1,9 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import YAML from 'yaml';
+import {toMs} from 'ms-typescript';
 
-enum TimeUnit {
-  S = 1000,
-  M = 60 * 1000,
-  H = 60 * 60 * 1000
-}
-
-function toMilliseconds(timeWithUnit: string): number {
-  const unitStr = timeWithUnit.substring(timeWithUnit.length - 1);
-  const unit = TimeUnit[unitStr.toUpperCase() as keyof typeof TimeUnit];
-  if (!unit) {
-    throw new Error('Unknown time unit ' + unitStr);
-  }
-  const time = parseFloat(timeWithUnit);
-  return time * unit;
-}
-
-type TParsedWorkflowInputs = { [key: string]: unknown } | { meta: unknown };
+type TParsedWorkflowInputs = { [key: string]: unknown } | { meta?: unknown };
 
 export function parseWorkflowInputs(inputsJsonOrYaml: string) {
   if (inputsJsonOrYaml === '') {
@@ -66,13 +51,13 @@ export function getInputs() {
 
   const displayWorkflowUrlStr = core.getInput('display-workflow-run-url');
   const displayWorkflowUrl = displayWorkflowUrlStr && displayWorkflowUrlStr === 'true';
-  const displayWorkflowUrlTimeout = toMilliseconds(core.getInput('display-workflow-run-url-timeout'));
-  const displayWorkflowUrlInterval = toMilliseconds(core.getInput('display-workflow-run-url-interval'));
+  const displayWorkflowUrlTimeout = toMs(core.getInput('display-workflow-run-url-timeout'));
+  const displayWorkflowUrlInterval = toMs(core.getInput('display-workflow-run-url-interval'));
 
   const waitForCompletionStr = core.getInput('wait-for-completion');
   const waitForCompletion = waitForCompletionStr && waitForCompletionStr === 'true';
-  const waitForCompletionTimeout = toMilliseconds(core.getInput('wait-for-completion-timeout'));
-  const checkStatusInterval = toMilliseconds(core.getInput('wait-for-completion-interval'));
+  const waitForCompletionTimeout = toMs(core.getInput('wait-for-completion-timeout'));
+  const checkStatusInterval = toMs(core.getInput('wait-for-completion-interval'));
   const runName = core.getInput('run-name');
   const workflowLogMode = core.getInput('workflow-logs');
 
