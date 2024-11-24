@@ -99,7 +99,6 @@ jobs:
           workflow: dummy.yaml
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
-          run-name: dummy-json
           display-workflow-run-url: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |-

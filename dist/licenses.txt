@@ -468,7 +468,7 @@ The following npm packages may be included in this product:
  - @types/istanbul-lib-coverage@2.0.6
  - @types/istanbul-lib-report@3.0.3
  - @types/istanbul-reports@3.0.4
- - @types/node@22.9.1
+ - @types/node@22.9.3
  - @types/yargs-parser@21.0.3
  - @types/yargs@15.0.19
 
