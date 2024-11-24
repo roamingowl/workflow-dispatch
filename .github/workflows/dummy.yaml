@@ -1,4 +1,5 @@
 name: Dummy workflow
+run-name: ${{ inputs.meta != '' && fromJSON(inputs.meta).run-name != '' }}
 
 on:
   workflow_dispatch:

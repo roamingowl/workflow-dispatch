@@ -69,7 +69,6 @@ export class WorkflowHandler {
         repo: this.repo,
         workflow_id: workflowId,
         ref: this.ref,
-        run_name: this.runName,
         inputs
       });
       debug('Workflow Dispatch', dispatchResp);

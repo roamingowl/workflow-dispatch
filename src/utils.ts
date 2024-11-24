@@ -4,7 +4,7 @@ import YAML from 'yaml';
 import { toMs } from 'ms-typescript';
 import { DEFAULT_JOB_SUMMARY_TEMPLATE } from './templates/summary';
 
-type TParsedWorkflowInputs = { [key: string]: unknown } | { meta?: unknown };
+type TParsedWorkflowInputs = { [key: string]: string } | { meta?: { [key: string]: string | unknown } };
 
 export function parseWorkflowInputs(inputsJsonOrYaml: string) {
   if (inputsJsonOrYaml === '') {
@@ -32,10 +32,7 @@ export function parseWorkflowInputs(inputsJsonOrYaml: string) {
     throw error;
   }
   core.debug('Inputs parsed as YAML');
-  const meta = (parsedInputs as TParsedWorkflowInputs)?.meta;
-  if (meta) {
-    (parsedInputs as TParsedWorkflowInputs).meta = JSON.stringify(meta);
-  }
+
   return parsedInputs;
 }
 export function getInputs() {
@@ -65,6 +62,15 @@ export function getInputs() {
   let stepSummaryTemplate = DEFAULT_JOB_SUMMARY_TEMPLATE;
   if (stepSummaryTemplateString !== '') {
     stepSummaryTemplate = stepSummaryTemplateString;
+  }
+
+  //meta processing
+  const meta = (inputs as TParsedWorkflowInputs)?.meta;
+  if (meta) {
+    if (runName) {
+      (meta as { [key: string]: string | unknown })['run-name'] = runName;
+    }
+    (inputs as TParsedWorkflowInputs).meta = JSON.stringify(meta);
   }
 
   return {
