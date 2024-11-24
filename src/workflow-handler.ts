@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
+import type { RequestError } from '@octokit/request-error';
 import { debug } from './debug';
 
 export enum WorkflowRunStatus {
@@ -71,7 +72,10 @@ export class WorkflowHandler {
         inputs
       });
       debug('Workflow Dispatch', dispatchResp);
-    } catch (error) {
+    } catch (error: unknown) {
+      if ((error as RequestError).status === 404) {
+        core.warning(`Workflow not found: ${this.workflowRef}`);
+      }
       debug('Workflow Dispatch error', (error as Error).message);
       throw error;
     }
