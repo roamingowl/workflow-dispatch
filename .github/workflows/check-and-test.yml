@@ -167,7 +167,7 @@ jobs:
 
       - uses: ./
         with:
-          workflow: dummy2.yaml
+          workflow: dummy.yaml
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
