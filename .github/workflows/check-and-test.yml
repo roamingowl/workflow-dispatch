@@ -148,10 +148,15 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |
             meta:
-              workflows:
-                - parent-workflow-name: ${{ github.workflow }}`,
-                  parent-workflow-url: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${{github.run_attempt}}`,
-                  parent-workflow-repo: ${{ github.repository }}
+              custom1: value 1
+              custom2: |
+                value 2
+              custom3: |-
+                value 3a
+                value 3b
+              custom4: value 4
+              custom5: value 5
+              custom6: value 6
             value: test_value  
 
   test-yaml-with-logs:
@@ -171,11 +176,6 @@ jobs:
           print-step-summary: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |
-            meta:
-              workflows:
-                - parent-workflow-name: ${{ github.workflow }}`,
-                  parent-workflow-url: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id}}/attempts/${{github.run_attempt}}`,
-                  parent-workflow-repo: ${{ github.repository }}
             value: test_value  
 
 
