@@ -94,42 +94,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare meta data
-        id: meta
-        uses: ./.github/actions/prepare-meta
-
-      - name: Merge inputs
-        id: merge-inputs
-        env:
-          META_JSON: ${{ steps.meta.outputs.json }}
-          WORKFLOW_INPUTS_JSON: |
-            {
-              "value": "test_value"
-            }
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { META_JSON, WORKFLOW_INPUTS_JSON } = process.env;
-
-            const parsedInputs = JSON.parse(WORKFLOW_INPUTS_JSON);
-            const parsedMeta = JSON.parse(JSON.parse(META_JSON));
-
-            console.log(`[DEBUG]Parsed inputs: ${JSON.stringify(parsedInputs)}`);
-            console.log(`[DEBUG]Parsed meta: ${JSON.stringify(parsedMeta)}`);
-
-            const inputs = {...parsedInputs, meta: JSON.stringify({...parsedMeta})}; 
-
-            return JSON.stringify(inputs);
-
       - uses: ./
         with:
           workflow: dummy.yaml
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
+          run-name: dummy-json
           display-workflow-run-url: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |-
-            ${{ fromJSON(steps.merge-inputs.outputs.result) }}
+            {
+              "value1": "test_value1",
+              "value2": "test_value2",
+              "value3": "test_value3",
+              "value4": "test_value4"
+            }
 
 
   test-yaml:
@@ -144,6 +123,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
+          run-name: dummy-yaml
           print-step-summary: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |
@@ -171,7 +151,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
-          run-name: dummy-with-logs
+          run-name: dummy-yaml-with-logs
           workflow-logs: print
           print-step-summary: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
