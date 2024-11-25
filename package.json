@@ -40,7 +40,7 @@
     "@actions/github": "6.0.0",
     "esbuild-jest": "^0.5.0",
     "pretty-ms": "^9.2.0",
-    "yaml": "^2.6.0"
+    "yaml": "^2.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
