@@ -32,7 +32,7 @@ runs:
           let summary = 'Dispatch breadcrumbs:\n';
           
           metaData.workflows.forEach((workflow) => {
-            summary += `- [${workflow['parent-workflow-name']}](${workflow['parent-workflow-url']})\n`;
+            summary += `- [${workflow['name']}](${workflow['url']})\n`;
           });
           
           summary += '- this workflow\n';

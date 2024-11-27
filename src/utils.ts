@@ -4,7 +4,8 @@ import YAML from 'yaml';
 import { toMs } from 'ms-typescript';
 import { DEFAULT_JOB_SUMMARY_TEMPLATE } from './templates/summary';
 
-type TParsedWorkflowInputs = { [key: string]: string } | { meta?: { [key: string]: string | unknown } };
+type TParsedWorkflowInputs = { [key: string]: { [key: string]: string | unknown } };
+type TMetaWorkflow = { name: string; url: string; repo: string };
 
 export function parseWorkflowInputs(inputsJsonOrYaml: string) {
   if (inputsJsonOrYaml === '') {
@@ -64,14 +65,24 @@ export function getInputs() {
     stepSummaryTemplate = stepSummaryTemplateString;
   }
 
-  //meta processing
-  const meta = (inputs as TParsedWorkflowInputs)?.meta;
-  if (meta) {
-    if (runName) {
-      (meta as { [key: string]: string | unknown })['run-name'] = runName;
-    }
-    (inputs as TParsedWorkflowInputs).meta = JSON.stringify(meta);
+  //TODO: types!!!
+  let meta = (inputs as TParsedWorkflowInputs)?.meta;
+  if (typeof meta === 'undefined') {
+    meta = { workflows: [] };
   }
+  if (typeof meta.workflows === 'undefined') {
+    meta.workflows = [];
+  }
+
+  if (runName) {
+    (meta as { [key: string]: string | unknown })['run-name'] = runName;
+  }
+  (meta.workflows as TMetaWorkflow[]).push({
+    name: github.context.workflow,
+    url: `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/${parseInt(process.env.GITHUB_RUN_ATTEMPT as string)}`,
+    repo: `${github.context.repo.owner}/${github.context.repo.repo}`
+  });
+  (inputs as { [key: string]: unknown }).meta = JSON.stringify(meta);
 
   return {
     token,
