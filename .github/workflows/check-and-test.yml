@@ -114,8 +114,8 @@ jobs:
             }
 
 
-  test-yaml:
-    name: Test YAML
+  test-yaml-with-meta:
+    name: Test YAML with meta
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -140,7 +140,25 @@ jobs:
               custom4: value 4
               custom5: value 5
               custom6: value 6
-            value: test_value  
+            value: test_value
+
+  test-yaml-withOUT-meta:
+    name: Test YAML without meta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            value: test_value
 
   test-yaml-with-logs:
     name: Test YAML with logs
