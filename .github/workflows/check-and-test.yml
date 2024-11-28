@@ -142,7 +142,7 @@ jobs:
               custom6: value 6
             value: test_value
 
-  test-yaml-withOUT-meta:
+  test-yaml-without-meta:
     name: Test YAML without meta
     runs-on: ubuntu-latest
     steps:
@@ -159,6 +159,32 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |
             value: test_value
+
+  test-yaml-custom template:
+    name: Test YAML with custom template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          step-summary-template: |
+            You can follow the dispatched workflow <%~ it.dispatchedWorkflow.name %> [here](<%~ it.dispatchedWorkflow.url %>).
+            <%- if (it.dispatchedWorkflow.conclusion == 'success') { -%>
+            🥳 Workflow successful
+            <%- } else { -%>
+            ☠️ Workflow failed for some reason 😔
+            <% } %>
+          inputs: |
+            value: test_value
+            
 
   test-yaml-with-logs:
     name: Test YAML with logs
