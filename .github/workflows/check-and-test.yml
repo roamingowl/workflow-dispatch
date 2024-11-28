@@ -160,7 +160,7 @@ jobs:
           inputs: |
             value: test_value
 
-  test-yaml-custom template:
+  test-yaml-custom-template:
     name: Test YAML with custom template
     runs-on: ubuntu-latest
     steps:
