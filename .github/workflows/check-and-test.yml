@@ -176,7 +176,7 @@ jobs:
           print-step-summary: true
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           step-summary-template: |
-            You can follow the dispatched workflow <%~ it.dispatchedWorkflow.name %> [here](<%~ it.dispatchedWorkflow.url %>).
+            Follow `<%~ it.dispatchedWorkflow.name %>`  ➡️➡️➡️  [here](<%~ it.dispatchedWorkflow.url %>).  
             <%- if (it.dispatchedWorkflow.conclusion == 'success') { -%>
             🥳 Workflow successful
             <%- } else { -%>
