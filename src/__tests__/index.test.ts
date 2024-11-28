@@ -5,7 +5,6 @@ import * as main from '../main';
 const runMock = vi.spyOn(main, 'run').mockImplementation(vi.fn());
 
 vi.spyOn(core, 'setFailed').mockImplementation(vi.fn());
-vi.spyOn(core, 'error').mockImplementation(vi.fn());
 
 
 describe('index', () => {
