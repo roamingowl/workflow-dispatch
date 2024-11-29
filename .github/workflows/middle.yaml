@@ -13,6 +13,10 @@ on:
         required: false
         default: ''
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   parent-info:
     name: Parent Info
@@ -46,6 +50,9 @@ jobs:
           display-workflow-run-url: true
           run-name: dummy-yaml-from-middle
           print-step-summary: true
+          meta: ${{ inputs.meta }}
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |
+            meta: 
+              some_meta_key: some_meta_value
             value: another_test_value
