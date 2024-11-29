@@ -18,6 +18,35 @@ permissions:
   actions: write
 
 jobs:
+  check-bundle:
+    name: Check bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build dist/ Directory
+        run: npm run bundle
+
+      - name: Compare Directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol --text dist/ | wc -l)" -gt "0" ]; then
+
+            echo "❌ Detected uncommitted changes after build. Maybe you forgot to run 'npm run -w ${{ inputs.working-directory }} build' locally?"
+
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff --ignore-space-at-eol --text dist/
+            exit 1
+          else
+            echo "✅ Bundle OK."
+          fi
+
   check-typescript:
     name: TS format and lint
     runs-on: ubuntu-latest
