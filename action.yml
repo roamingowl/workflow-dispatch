@@ -28,7 +28,7 @@ inputs:
   display-workflow-run-url:
     description: 'Get the URL of the triggered workflow and display it in logs (useful to follow the progress of the triggered workflow)'
     required: false
-    default: true
+    default: 'true'
   display-workflow-run-url-interval:
     description: 'The time to wait (+unit) between two polls to get the URL of the workflow run'
     required: false
@@ -40,7 +40,7 @@ inputs:
   wait-for-completion:
     description: 'Block until the triggered workflow has finished'
     required: false
-    default: true
+    default: 'true'
   wait-for-completion-timeout:
     description: 'Maximum amount of time (+unit) to wait to mark workflow as timed out'
     required: false
@@ -57,7 +57,19 @@ inputs:
       `output` retrieves logs from triggered workflow and set them as `workflow-logs` output.
       `json-output` retrieves logs from triggered workflow and return a json array groupped by job name.
     required: false
-    default: ignore
+    default: 'ignore'
+  print-step-summary:
+    description: >- 
+      Prints dispatching workflow info and result into step summary. 
+      See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary
+    required: false
+    default: 'true'
+  step-summary-template:
+    description: >- 
+      Template for the step summary. Can be a string or a path to a file. 
+      Templating language is ETA. See https://eta.js.org/. If empty, default template is used.
+    required: false
+    default: ''
 
 outputs:
   workflow-conclusion:
@@ -71,6 +83,8 @@ outputs:
       Logs of the triggered workflow. Based on `inputs.workflow-logs`, format is set to:
         - `output`: Multiline logs formatted as: '<job-name> | <datetime> <message>'
         - `json-output`: JSON logs formatted as: '{"<job-name>": [{"<datetime>": "<message>"}]'
+  step-summary-markdown:
+    description: 'Summary of the step in markdown format'
 
 runs:
   using: node20

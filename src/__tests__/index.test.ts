@@ -1,7 +1,11 @@
-import {vi, describe, it, expect} from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
+import * as core from '@actions/core';
 import * as main from '../main';
 
 const runMock = vi.spyOn(main, 'run').mockImplementation(vi.fn());
+
+vi.spyOn(core, 'setFailed').mockImplementation(vi.fn());
+
 
 describe('index', () => {
   it('calls run when imported', async () => {

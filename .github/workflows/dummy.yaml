@@ -1,4 +1,5 @@
 name: Dummy workflow
+run-name: ${{ inputs.meta != '' && fromJSON(inputs.meta).run-name || 'Dummy workflow' }}
 
 on:
   workflow_dispatch:
@@ -32,4 +33,8 @@ jobs:
           echo "Meta: ${{ github.event.inputs.meta }}"
       - name: Echo value
         run: |
-          echo 'Received value from parent: `${{ github.event.inputs.value }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Received input value from parent: `${{ github.event.inputs.value }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Received input meta from parent:' >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          echo ${{ github.event.inputs.meta }} >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

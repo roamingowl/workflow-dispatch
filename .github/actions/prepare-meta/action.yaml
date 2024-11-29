@@ -43,9 +43,9 @@ runs:
           
           metaData.workflows.push(
             {
-              "parent-workflow-name":`${context.workflow}`,
-              "parent-workflow-url":`${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/attempts/${attempt}`,
-              "parent-workflow-repo":`${context.repo.owner}/${context.repo.repo}`
+              "name":`${context.workflow}`,
+              "url":`${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/attempts/${attempt}`,
+              "repo":`${context.repo.owner}/${context.repo.repo}`
             }
           );
           

@@ -9,13 +9,17 @@ on:
     branches:
       - main
 
+concurrency:
+  group: "${{ github.ref  }}-${{ github.workflow }}"
+  cancel-in-progress: true
+
 permissions:
   contents: read
   actions: write
 
 jobs:
   check-typescript:
-    name: TypeScript Checks
+    name: TS format and lint
     runs-on: ubuntu-latest
 
     steps:
@@ -53,7 +57,7 @@ jobs:
           retention-days: 90
 
   sonarcloud:
-    name: TS Tests and SonarCloud Scan
+    name: Unit tests and SonarCloud Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -84,38 +88,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  test:
-    name: Test
+  test-json:
+    name: Test JSON
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Prepare meta data
-        id: meta
-        uses: ./.github/actions/prepare-meta
-
-      - name: Merge inputs
-        id: merge-inputs
-        env:
-          META_JSON: ${{ steps.meta.outputs.json }}
-          WORKFLOW_INPUTS_JSON: |
-            {
-              "value": "test_value"
-            }
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { META_JSON, WORKFLOW_INPUTS_JSON } = process.env;
-
-            const parsedInputs = JSON.parse(WORKFLOW_INPUTS_JSON);
-            const parsedMeta = JSON.parse(JSON.parse(META_JSON));
-
-            console.log(`[DEBUG]Parsed inputs: ${JSON.stringify(parsedInputs)}`);
-            console.log(`[DEBUG]Parsed meta: ${JSON.stringify(parsedMeta)}`);
-
-            const inputs = {...parsedInputs, meta: JSON.stringify({...parsedMeta})}; 
-
-            return JSON.stringify(inputs);
 
       - uses: ./
         with:
@@ -123,8 +100,129 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: true
           display-workflow-run-url: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
           inputs: |-
-            ${{ fromJSON(steps.merge-inputs.outputs.result) }}
+            {
+              "meta": {
+                "custom1": "value 1",
+                "custom2": "value 2",
+                "custom3": "value 3",
+                "custom4": "value 4",
+                "custom5": "value 5",
+                "custom6": "value 6"
+              }
+            }
+
+
+  test-yaml-with-meta:
+    name: Test YAML with meta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            meta:
+              custom1: value 1
+              custom2: |
+                value 2
+              custom3: |-
+                value 3a
+                value 3b
+              custom4: value 4
+              custom5: value 5
+              custom6: value 6
+            value: test_value
+
+  test-yaml-without-meta:
+    name: Test YAML without meta
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            value: test_value
+
+  test-yaml-multi-level-dispatch:
+    name: Test YAML multi-level dispatch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: middle.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: middle-yaml
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            value: test_value_middle
+
+  test-yaml-custom-template:
+    name: Test YAML with custom template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          step-summary-template: |
+            Follow `<%~ it.dispatchedWorkflow.name %>`  ➡️➡️➡️  [here](<%~ it.dispatchedWorkflow.url %>).  
+            
+            <%- if (it.dispatchedWorkflow.conclusion == 'success') { -%>
+            🥳 Workflow successful
+            <%- } else { -%>
+            ☠️ Workflow failed for some reason 😔
+            <% } %>
+          inputs: |
+            value: test_value
+            
+
+  test-yaml-with-logs:
+    name: Test YAML with logs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml-with-logs
+          workflow-logs: print
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            value: test_value  
 
 
 

@@ -1,0 +1,51 @@
+name: Middle workflow
+run-name: ${{ inputs.meta != '' && fromJSON(inputs.meta).run-name || 'Middle workflow' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      meta:
+        description: 'Meta information to pass to the workflow. JSON string'
+        required: false
+        default: ''
+      value:
+        description: 'Value to pass to the workflow. String'
+        required: false
+        default: ''
+
+jobs:
+  parent-info:
+    name: Parent Info
+    if: ${{ inputs.meta != '' && fromJSON(inputs.meta).workflows != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/parent-info
+        with:
+          meta: ${{ inputs.meta }}
+
+  some-other-job:
+    name: Middle job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Value
+        run: |
+          echo "value: ${{ inputs.value }}"
+
+  middle-dispatch:
+    name: Middle dispatch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          workflow: dummy.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          wait-for-completion: true
+          display-workflow-run-url: true
+          run-name: dummy-yaml-from-middle
+          print-step-summary: true
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          inputs: |
+            value: another_test_value

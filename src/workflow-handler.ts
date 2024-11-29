@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
+import type { RequestError } from '@octokit/request-error';
 import { debug } from './debug';
 
 export enum WorkflowRunStatus {
@@ -42,8 +43,6 @@ export interface WorkflowRunResult {
   conclusion: WorkflowRunConclusion;
 }
 
-type TInputs = Record<string, string>;
-
 export class WorkflowHandler {
   private octokit: ReturnType<typeof github.getOctokit>;
   private workflowId?: number | string;
@@ -58,11 +57,10 @@ export class WorkflowHandler {
     private ref: string,
     private runName: string
   ) {
-    // Get octokit client for making API calls
     this.octokit = github.getOctokit(token);
   }
 
-  async triggerWorkflow(inputs: TInputs) {
+  async triggerWorkflow(inputs: { [key: string]: unknown }) {
     try {
       const workflowId = await this.getWorkflowId();
       this.triggerDate = new Date().setMilliseconds(0);
@@ -74,7 +72,10 @@ export class WorkflowHandler {
         inputs
       });
       debug('Workflow Dispatch', dispatchResp);
-    } catch (error) {
+    } catch (error: unknown) {
+      if ((error as RequestError).status === 404) {
+        core.warning(`Workflow not found: ${this.workflowRef}`);
+      }
       debug('Workflow Dispatch error', (error as Error).message);
       throw error;
     }
