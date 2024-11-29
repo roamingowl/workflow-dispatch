@@ -70,8 +70,10 @@ export function getInputs() {
   //TODO: types!!!
   let meta = (inputs as TParsedWorkflowInputs)?.meta;
   if (parentMeta !== '') {
+    core.info('Parent meta detected');
     try {
       const parsedParentMeta = JSON.parse(parentMeta);
+      core.info(`Parent meta parsed ${JSON.stringify(parsedParentMeta, null, 2)}`);
       if (Array.isArray(parsedParentMeta.workflows)) {
         meta.workflows = parsedParentMeta.workflows;
       }
@@ -80,9 +82,11 @@ export function getInputs() {
     }
   }
   if (typeof meta === 'undefined') {
+    core.info('No meta detected');
     meta = { workflows: [] };
   }
   if (typeof meta.workflows === 'undefined') {
+    core.info('No parent workflows detected');
     meta.workflows = [];
   }
 
@@ -94,6 +98,7 @@ export function getInputs() {
     url: `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/${parseInt(process.env.GITHUB_RUN_ATTEMPT as string)}`,
     repo: `${github.context.repo.owner}/${github.context.repo.repo}`
   });
+  core.info(`New meta: ${JSON.stringify(meta, null, 2)}`);
   (inputs as { [key: string]: unknown }).meta = JSON.stringify(meta);
 
   return {
