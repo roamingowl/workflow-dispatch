@@ -48,6 +48,8 @@ export function getInputs() {
   // Decode inputs, this MUST be a valid JSON string
   const inputs = parseWorkflowInputs(core.getInput('inputs'));
 
+  const parentMeta = core.getInput('meta');
+
   const displayWorkflowUrl = core.getInput('display-workflow-run-url') === 'true';
   const displayWorkflowUrlTimeout = toMs(core.getInput('display-workflow-run-url-timeout'));
   const displayWorkflowUrlInterval = toMs(core.getInput('display-workflow-run-url-interval'));
@@ -67,6 +69,15 @@ export function getInputs() {
 
   //TODO: types!!!
   let meta = (inputs as TParsedWorkflowInputs)?.meta;
+  if (parentMeta !== '') {
+    try {
+      const parsedParentMeta = JSON.parse(parentMeta);
+      if (Array.isArray(parsedParentMeta.workflows))
+      meta.workflows = parsedParentMeta.workflows;
+    } catch (error) {
+      core.debug(`Failed to parse meta as JSON: ${(error as Error).message}`);
+    }
+  }
   if (typeof meta === 'undefined') {
     meta = { workflows: [] };
   }

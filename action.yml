@@ -70,6 +70,10 @@ inputs:
       Templating language is ETA. See https://eta.js.org/. If empty, default template is used.
     required: false
     default: ''
+  meta:
+    description: 'Meta information from the dispatcher (if there is any). This is a stringified JSON'
+    required: false
+    default: ''
 
 outputs:
   workflow-conclusion:
