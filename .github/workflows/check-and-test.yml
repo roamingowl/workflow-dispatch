@@ -56,7 +56,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js xxxxx ssss
+      - name: Setup Node.js xxxxx ssss ssss
         id: setup-node
         uses: actions/setup-node@v4
         with:
