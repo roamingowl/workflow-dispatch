@@ -19,7 +19,6 @@ export async function printSummary(
     displayWorkflowUrl
   };
   const summary = eta.renderString(stepSummaryTemplate, templateData);
-  console.debug(summary);
   await core.summary.addRaw(summary).write();
   core.setOutput('step-summary-markdown', summary);
 }
