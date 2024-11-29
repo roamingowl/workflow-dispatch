@@ -72,8 +72,9 @@ export function getInputs() {
   if (parentMeta !== '') {
     try {
       const parsedParentMeta = JSON.parse(parentMeta);
-      if (Array.isArray(parsedParentMeta.workflows))
-      meta.workflows = parsedParentMeta.workflows;
+      if (Array.isArray(parsedParentMeta.workflows)) {
+        meta.workflows = parsedParentMeta.workflows;
+      }
     } catch (error) {
       core.debug(`Failed to parse meta as JSON: ${(error as Error).message}`);
     }
