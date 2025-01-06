@@ -41,7 +41,7 @@
     "eta": "^3.5.0",
     "ms-typescript": "^2.0.0",
     "pretty-ms": "^9.2.0",
-    "yaml": "2.6.1"
+    "yaml": "2.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
